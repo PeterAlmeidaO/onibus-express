@@ -29,19 +29,20 @@ namespace OnibusExpress.Api.Controllers
 
         [HttpGet("{codigo}")]
         [ProducesResponseType(typeof(ReservaDetalheDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErroDto), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ReservaDetalheDto>> ConsultarPorCodigo([FromRoute] string codigo)
+        public async Task<ActionResult<ReservaDetalheDto>> ConsultarPorCodigo([FromRoute] string codigo, [FromHeader(Name = "X-Cpf")] string cpf)
         {
-            return Ok(await _reservaService.ConsultarPorCodigoAsync(codigo));
+            return Ok(await _reservaService.ConsultarPorCodigoAsync(codigo, cpf));
         }
 
         [HttpDelete("{codigo}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErroDto), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErroDto), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CancelarReserva([FromRoute] string codigo)
+        public async Task<IActionResult> CancelarReserva([FromRoute] string codigo, [FromHeader(Name = "X-Cpf")] string cpf)
         {
-            await _reservaService.CancelarAsync(codigo);
+            await _reservaService.CancelarAsync(codigo, cpf);
             return NoContent();
         }
     }

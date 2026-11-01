@@ -38,9 +38,9 @@ namespace OnibusExpress.Tests.Unit.Controllers
         {
             var detalhe = new ReservaDetalheDto("ONI-ABCDEF1234", "Confirmada", 10,
                 new ReservaViagemDto("São Paulo", "Rio de Janeiro", DateTime.UtcNow), new ReservaPassageiroDto("João", "***.982.247-**"));
-            _mockService.Setup(s => s.ConsultarPorCodigoAsync("ONI-ABCDEF1234")).ReturnsAsync(detalhe);
+            _mockService.Setup(s => s.ConsultarPorCodigoAsync("ONI-ABCDEF1234", "52998224725")).ReturnsAsync(detalhe);
 
-            var resultado = await _controller.ConsultarPorCodigo("ONI-ABCDEF1234");
+            var resultado = await _controller.ConsultarPorCodigo("ONI-ABCDEF1234", "52998224725");
 
             var ok = Assert.IsType<OkObjectResult>(resultado.Result);
             Assert.Same(detalhe, ok.Value);
@@ -49,10 +49,10 @@ namespace OnibusExpress.Tests.Unit.Controllers
         [Fact]
         public async Task CancelarReserva_RetornaNoContent()
         {
-            var resultado = await _controller.CancelarReserva("ONI-ABCDEF1234");
+            var resultado = await _controller.CancelarReserva("ONI-ABCDEF1234", "52998224725");
 
             Assert.IsType<NoContentResult>(resultado);
-            _mockService.Verify(s => s.CancelarAsync("ONI-ABCDEF1234"), Times.Once);
+            _mockService.Verify(s => s.CancelarAsync("ONI-ABCDEF1234", "52998224725"), Times.Once);
         }
     }
 }
