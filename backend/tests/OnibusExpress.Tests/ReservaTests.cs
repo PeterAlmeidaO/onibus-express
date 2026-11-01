@@ -48,5 +48,17 @@ namespace OnibusExpress.Tests
             var excecao = Assert.Throws<InvalidOperationException>(() => reserva.Cancelar());
             Assert.Equal("O cancelamento só é permitido até 2 horas antes da partida.", excecao.Message);
         }
+
+        [Fact]
+        public void Nao_Deve_Cancelar_Reserva_Ja_Cancelada()
+        {
+            // Arrange
+            var reserva = new Reserva(CriarViagem(DateTime.UtcNow.AddHours(5)), CriarPassageiro(), 15);
+            reserva.Cancelar();
+
+            // Act & Assert
+            var excecao = Assert.Throws<InvalidOperationException>(() => reserva.Cancelar());
+            Assert.Equal("A reserva já está cancelada.", excecao.Message);
+        }
     }
 }

@@ -73,10 +73,10 @@ namespace OnibusExpress.Api.Controllers
 
             if (reserva == null) return NotFound(new { erro = "Reserva não encontrada." });
 
-            if (DateTime.UtcNow > reserva.Viagem.DataHoraPartida.AddHours(-2))
-                return BadRequest(new { erro = "Cancelamento negado. Prazo limite de 2 horas expirado." });
+            // A regra de prazo fica no domínio; a reserva é mantida com status Cancelada (histórico preservado)
+            try { reserva.Cancelar(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { erro = ex.Message }); }
 
-            _context.Reservas.Remove(reserva);
             await _context.SaveChangesAsync();
 
             return NoContent(); 
