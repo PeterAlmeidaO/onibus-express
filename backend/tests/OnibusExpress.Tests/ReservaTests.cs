@@ -1,5 +1,6 @@
 using System;
 using OnibusExpress.Domain.Entities;
+using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.ValueObjects;
 using Xunit;
 
@@ -45,7 +46,7 @@ namespace OnibusExpress.Tests
             var reserva = new Reserva(viagemProxima, passageiro, 15);
 
             // Act & Assert
-            var excecao = Assert.Throws<InvalidOperationException>(() => reserva.Cancelar());
+            var excecao = Assert.Throws<RegraNegocioException>(() => reserva.Cancelar());
             Assert.Equal("O cancelamento só é permitido até 2 horas antes da partida.", excecao.Message);
         }
 
@@ -65,7 +66,7 @@ namespace OnibusExpress.Tests
             reserva.Cancelar();
 
             // Act & Assert
-            var excecao = Assert.Throws<InvalidOperationException>(() => reserva.Cancelar());
+            var excecao = Assert.Throws<RegraNegocioException>(() => reserva.Cancelar());
             Assert.Equal("A reserva já está cancelada.", excecao.Message);
         }
     }

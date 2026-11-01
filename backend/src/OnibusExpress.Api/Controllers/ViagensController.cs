@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using OnibusExpress.Application.Interfaces;
-using OnibusExpress.Domain.Exceptions;
 using System;
 using System.Threading.Tasks;
 
@@ -26,11 +25,7 @@ namespace OnibusExpress.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Detalhes(Guid id)
         {
-            try
-            {
-                return Ok(await _viagemService.DetalhesAsync(id));
-            }
-            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
+            return Ok(await _viagemService.DetalhesAsync(id));
         }
     }
 }

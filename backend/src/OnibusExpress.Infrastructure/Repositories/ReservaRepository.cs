@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using OnibusExpress.Domain.Entities;
+using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.Interfaces;
 using OnibusExpress.Infrastructure.Context;
 
@@ -49,7 +50,7 @@ namespace OnibusExpress.Infrastructure.Repositories
                                                && pg.ConstraintName == AppDbContext.IndiceAssentoUnico)
             {
                 // Outra requisição reservou o mesmo assento entre a checagem e a gravação
-                throw new InvalidOperationException("Este assento já está ocupado.");
+                throw new ConflitoException("Este assento já está ocupado.");
             }
         }
     }
