@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using OnibusExpress.Domain.Entities;
 using OnibusExpress.Domain.ValueObjects;
 using OnibusExpress.Infrastructure.Context;
@@ -44,7 +45,17 @@ namespace OnibusExpress.Application.Services
             var reserva = new Reserva(viagem, passageiro, numeroAssento);
 
             _context.Reservas.Add(reserva);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } pg
+                                               && pg.ConstraintName == AppDbContext.IndiceAssentoUnico)
+            {
+                // Outra requisição reservou o mesmo assento entre a checagem acima e a gravação
+                throw new InvalidOperationException("Este assento já está ocupado.");
+            }
 
             return reserva;
         }

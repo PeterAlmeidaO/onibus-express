@@ -5,6 +5,8 @@ namespace OnibusExpress.Infrastructure.Context
 {
     public class AppDbContext : DbContext
     {
+        public const string IndiceAssentoUnico = "IX_Reservas_ViagemId_NumeroAssento_Confirmada";
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Rota> Rotas { get; set; }
@@ -20,6 +22,12 @@ namespace OnibusExpress.Infrastructure.Context
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.CodigoReserva).IsUnique(); // Garante código único no banco
                 entity.Property(e => e.CodigoReserva).HasMaxLength(20).IsRequired();
+
+                // Garante no banco que um assento só tenha uma reserva confirmada por viagem (evita overbooking concorrente)
+                entity.HasIndex(e => new { e.ViagemId, e.NumeroAssento })
+                      .IsUnique()
+                      .HasFilter($"\"Status\" = {(int)ReservaStatus.Confirmada}")
+                      .HasDatabaseName(IndiceAssentoUnico);
             });
 
             // Mapeamento do Passageiro e do Value Object (CPF)

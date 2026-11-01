@@ -75,7 +75,10 @@ namespace OnibusExpress.Infrastructure.Migrations
 
                     b.HasIndex("PassageiroId");
 
-                    b.HasIndex("ViagemId");
+                    b.HasIndex("ViagemId", "NumeroAssento")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Reservas_ViagemId_NumeroAssento_Confirmada")
+                        .HasFilter("\"Status\" = 0");
 
                     b.ToTable("Reservas");
                 });
