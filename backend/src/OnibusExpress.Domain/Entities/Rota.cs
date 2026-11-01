@@ -5,8 +5,8 @@ namespace OnibusExpress.Domain.Entities
     public class Rota
     {
         public Guid Id { get; private set; }
-        public string Origem { get; private set; }
-        public string Destino { get; private set; }
+        public string Origem { get; private set; } = null!;
+        public string Destino { get; private set; } = null!;
         public TimeSpan DuracaoEstimada { get; private set; }
 
         protected Rota() { }

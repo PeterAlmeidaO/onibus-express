@@ -34,7 +34,9 @@ namespace OnibusExpress.Infrastructure.Context
             modelBuilder.Entity<Passageiro>(entity =>
             {
                 entity.HasKey(e => e.Id);
-                
+                entity.Property(e => e.Nome).HasMaxLength(150).IsRequired();
+                entity.Property(e => e.Email).HasMaxLength(254).IsRequired();
+
                 // Ensina o EF Core a salvar o Value Object Cpf na mesma tabela do Passageiro
                 entity.OwnsOne(e => e.Cpf, cpf =>
                 {
@@ -43,6 +45,12 @@ namespace OnibusExpress.Infrastructure.Context
                        .HasMaxLength(11)
                        .IsRequired();
                 });
+            });
+
+            modelBuilder.Entity<Rota>(entity =>
+            {
+                entity.Property(e => e.Origem).HasMaxLength(100).IsRequired();
+                entity.Property(e => e.Destino).HasMaxLength(100).IsRequired();
             });
 
             base.OnModelCreating(modelBuilder);

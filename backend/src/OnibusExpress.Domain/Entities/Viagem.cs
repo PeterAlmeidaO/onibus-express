@@ -6,7 +6,7 @@ namespace OnibusExpress.Domain.Entities
     {
         public Guid Id { get; private set; }
         public Guid RotaId { get; private set; }
-        public Rota Rota { get; private set; }
+        public Rota Rota { get; private set; } = null!;
         public DateTime DataHoraPartida { get; private set; }
         public decimal PrecoBase { get; private set; }
         public int TotalAssentos { get; private set; }
