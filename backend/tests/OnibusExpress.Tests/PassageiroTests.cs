@@ -21,5 +21,26 @@ namespace OnibusExpress.Tests
             Assert.Equal(new DateTime(1990, 1, 1), passageiro.DataNascimento.Date);
             Assert.Equal(TimeSpan.Zero, passageiro.DataNascimento.TimeOfDay);
         }
+
+        [Fact]
+        public void Deve_Atualizar_Nome_E_Email_Do_Passageiro()
+        {
+            var passageiro = new Passageiro("João Silva", new Cpf("52998224725"), "joao@email.com", new DateTime(1990, 1, 1));
+
+            passageiro.AtualizarContato("João S. Silva", "novo@email.com");
+
+            Assert.Equal("João S. Silva", passageiro.Nome);
+            Assert.Equal("novo@email.com", passageiro.Email);
+        }
+
+        [Theory]
+        [InlineData("", "novo@email.com")]
+        [InlineData("João", " ")]
+        public void Nao_Deve_Atualizar_Contato_Com_Dados_Vazios(string nome, string email)
+        {
+            var passageiro = new Passageiro("João Silva", new Cpf("52998224725"), "joao@email.com", new DateTime(1990, 1, 1));
+
+            Assert.Throws<ArgumentException>(() => passageiro.AtualizarContato(nome, email));
+        }
     }
 }

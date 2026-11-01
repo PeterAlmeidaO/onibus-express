@@ -38,10 +38,18 @@ namespace OnibusExpress.Application.Services
                 throw new InvalidOperationException("Este assento já está ocupado.");
 
             var passageiro = await _context.Passageiros
-                .FirstOrDefaultAsync(p => p.Cpf.Numero == cpf.Numero) 
-                ?? new Passageiro(nome, cpf, email, dataNascimento);
+                .FirstOrDefaultAsync(p => p.Cpf.Numero == cpf.Numero);
 
-            if (passageiro.Id == Guid.Empty) _context.Passageiros.Add(passageiro);
+            if (passageiro == null)
+            {
+                passageiro = new Passageiro(nome, cpf, email, dataNascimento);
+                _context.Passageiros.Add(passageiro);
+            }
+            else
+            {
+                // Passageiro já cadastrado pelo CPF: mantém o cadastro e atualiza os dados de contato informados
+                passageiro.AtualizarContato(nome, email);
+            }
 
             var reserva = new Reserva(viagem, passageiro, numeroAssento);
 

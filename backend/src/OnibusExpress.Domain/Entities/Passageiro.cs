@@ -27,5 +27,14 @@ namespace OnibusExpress.Domain.Entities
             // Npgsql rejeita DateTime com Kind Unspecified em timestamptz; data de nascimento não tem hora
             DataNascimento = DateTime.SpecifyKind(dataNascimento.Date, DateTimeKind.Utc);
         }
+
+        public void AtualizarContato(string nome, string email)
+        {
+            if (string.IsNullOrWhiteSpace(nome)) throw new ArgumentException("O nome é obrigatório.");
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("O e-mail é obrigatório.");
+
+            Nome = nome;
+            Email = email;
+        }
     }
 }
