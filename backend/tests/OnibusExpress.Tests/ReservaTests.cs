@@ -50,6 +50,14 @@ namespace OnibusExpress.Tests
         }
 
         [Fact]
+        public void Deve_Gerar_Codigo_De_Reserva_Com_Dez_Caracteres_Aleatorios()
+        {
+            var reserva = new Reserva(CriarViagem(DateTime.UtcNow.AddHours(5)), CriarPassageiro(), 15);
+
+            Assert.Matches("^ONI-[0-9A-F]{10}$", reserva.CodigoReserva);
+        }
+
+        [Fact]
         public void Nao_Deve_Cancelar_Reserva_Ja_Cancelada()
         {
             // Arrange

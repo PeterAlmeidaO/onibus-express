@@ -37,7 +37,8 @@ namespace OnibusExpress.Domain.Entities
 
         private void GerarCodigoReserva()
         {
-            var randomPart = Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
+            // 10 hex = ~1 trilhão de combinações; com 5 a colisão no índice único ficava provável em ~1.200 reservas
+            var randomPart = Guid.NewGuid().ToString("N")[..10].ToUpper();
             CodigoReserva = $"ONI-{randomPart}";
         }
 
