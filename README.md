@@ -54,10 +54,19 @@ Esta é a maneira mais rápida e isolada. Não é necessário ter o SDK do .NET 
 
 1. Abra o terminal na pasta raiz do projeto (onde está localizado o arquivo `docker-compose.yml`).
 
-2. Execute o comando para compilar as imagens e subir os serviços:
+2. Crie o arquivo `.env` a partir do modelo e defina uma senha em `POSTGRES_PASSWORD`:
 
    ```bash
-   docker-compose up --build
+   cp .env.example .env
+   ```
+
+3. Execute o comando para compilar as imagens e subir os serviços:
+
+   ```bash
+   docker compose up --build
+   ```
+
+
 Aguarde o terminal indicar que o banco de dados está pronto e que a API iniciou (Application started.). As migrations e o banco de testes serão configurados automaticamente nesta etapa.
 
 Acesse a documentação interativa e realize os testes dos endpoints diretamente no navegador através da URL:
@@ -70,9 +79,12 @@ Pré-requisitos adicionais: SDK do .NET 10 instalado e um servidor PostgreSQL at
 
 Passo a Passo:
 
-Abra o arquivo appsettings.Development.json localizado em src/OnibusExpress.Api/.
+A senha do banco não fica versionada no `appsettings.json`. Configure a string de conexão via user-secrets (na pasta `backend/src/OnibusExpress.Api`):
 
-Certifique-se de ajustar a string de conexão DefaultConnection com o usuário, senha e host do seu PostgreSQL local.
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Database=onibus_express;Username=postgres;Password=SUA_SENHA"
+```
 
 No terminal, navegue até a pasta raiz do backend (onde se encontra o arquivo de solução .sln).
 
