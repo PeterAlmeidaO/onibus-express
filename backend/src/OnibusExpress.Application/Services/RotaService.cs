@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using OnibusExpress.Domain.Entities;
+using OnibusExpress.Application.DTOs;
+using OnibusExpress.Application.Mappings;
 using OnibusExpress.Domain.Interfaces;
 
 namespace OnibusExpress.Application.Services
@@ -14,6 +16,10 @@ namespace OnibusExpress.Application.Services
             _rotaRepository = rotaRepository;
         }
 
-        public Task<IEnumerable<Rota>> ListarTodasAsync() => _rotaRepository.GetAllAsync();
+        public async Task<IEnumerable<RotaDto>> ListarTodasAsync()
+        {
+            var rotas = await _rotaRepository.GetAllAsync();
+            return rotas.Select(r => r.ToDto());
+        }
     }
 }

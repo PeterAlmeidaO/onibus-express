@@ -18,8 +18,7 @@ namespace OnibusExpress.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> ListarTodas()
         {
-            var rotas = await _rotaService.ListarTodasAsync();
-            return Ok(rotas);
+            return Ok(await _rotaService.ListarTodasAsync());
         }
     }
 }

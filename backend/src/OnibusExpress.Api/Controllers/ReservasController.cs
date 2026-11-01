@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OnibusExpress.Application.DTOs;
 using OnibusExpress.Application.Services;
 using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Api.Validations;
@@ -21,19 +22,16 @@ namespace OnibusExpress.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar([FromBody] CriarReservaRequest request)
+        public async Task<IActionResult> Criar([FromBody] CriarReservaDto dto)
         {
-            if (!CpfValidator.Validar(request.Cpf))
+            if (!CpfValidator.Validar(dto.Cpf))
                 return BadRequest(new { erro = "CPF inválido." });
 
             try
             {
-                var reserva = await _reservaService.CriarReservaAsync(
-                    request.ViagemId, request.Nome, request.Cpf, 
-                    request.Email, request.DataNascimento, request.NumeroAssento
-                );
+                var reserva = await _reservaService.CriarReservaAsync(dto);
 
-                return CreatedAtAction(nameof(ConsultarPorCodigo), new { codigo = reserva.CodigoReserva }, new { reserva.CodigoReserva, reserva.Status });
+                return CreatedAtAction(nameof(ConsultarPorCodigo), new { codigo = reserva.CodigoReserva }, reserva);
             }
             catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
             catch (ArgumentException ex) { return BadRequest(new { erro = ex.Message }); }
@@ -41,7 +39,7 @@ namespace OnibusExpress.Api.Controllers
             catch (Exception ex)
             {
                 // Detalhe vai só para o log; o cliente recebe mensagem genérica
-                _logger.LogError(ex, "Erro ao criar reserva para a viagem {ViagemId}", request.ViagemId);
+                _logger.LogError(ex, "Erro ao criar reserva para a viagem {ViagemId}", dto.ViagemId);
                 return StatusCode(500, new { erro = "Erro interno ao processar a reserva." });
             }
         }
@@ -53,14 +51,7 @@ namespace OnibusExpress.Api.Controllers
         {
             try
             {
-                var reserva = await _reservaService.ConsultarPorCodigoAsync(codigo);
-
-                return Ok(new
-                {
-                    Codigo = reserva.CodigoReserva, Status = reserva.Status, Assento = reserva.NumeroAssento,
-                    Viagem = new { Origem = reserva.Viagem.Rota.Origem, Destino = reserva.Viagem.Rota.Destino, Partida = reserva.Viagem.DataHoraPartida },
-                    Passageiro = new { Nome = reserva.Passageiro.Nome, Cpf = reserva.Passageiro.Cpf.Mascarado() }
-                });
+                return Ok(await _reservaService.ConsultarPorCodigoAsync(codigo));
             }
             catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
         }
@@ -79,7 +70,5 @@ namespace OnibusExpress.Api.Controllers
             catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
             catch (InvalidOperationException ex) { return BadRequest(new { erro = ex.Message }); }
         }
-    } 
-
-    public record CriarReservaRequest(Guid ViagemId, string Nome, string Cpf, string Email, DateTime DataNascimento, int NumeroAssento);
+    }
 }
