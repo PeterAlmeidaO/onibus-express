@@ -30,7 +30,7 @@ namespace OnibusExpress.Application.Services
             var viagem = await _viagemRepository.GetByIdAsync(dto.ViagemId);
             if (viagem == null) throw new NotFoundException("Viagem não encontrada.");
 
-            if (viagem.IsPassada()) 
+            if (viagem.IsPassada())
                 throw new RegraNegocioException("Não é possível reservar passagens para uma viagem que já ocorreu.");
 
             if (dto.NumeroAssento <= 0 || dto.NumeroAssento > viagem.TotalAssentos)

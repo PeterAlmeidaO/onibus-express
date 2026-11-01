@@ -32,7 +32,7 @@ namespace OnibusExpress.Domain.Entities
             NumeroAssento = numeroAssento;
             Status = ReservaStatus.Confirmada;
             DataCriacao = DateTime.UtcNow;
-            
+
             GerarCodigoReserva();
         }
 
@@ -49,7 +49,7 @@ namespace OnibusExpress.Domain.Entities
             if (Status == ReservaStatus.Cancelada) throw new RegraNegocioException("A reserva já está cancelada.");
 
             var tempoAtePartida = Viagem.DataHoraPartida - DateTime.UtcNow;
-            
+
             if (tempoAtePartida.TotalHours < 2)
             {
                 throw new RegraNegocioException("O cancelamento só é permitido até 2 horas antes da partida.");

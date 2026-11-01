@@ -23,7 +23,7 @@ namespace OnibusExpress.Infrastructure.Context
             var viagem3 = new Viagem(rota2, DateTime.UtcNow.AddDays(1), 45.00m, 20);
 
             context.Viagens.AddRange(viagem1, viagem2, viagem3);
-            
+
             // 3. Salva no banco
             context.SaveChanges();
         }
