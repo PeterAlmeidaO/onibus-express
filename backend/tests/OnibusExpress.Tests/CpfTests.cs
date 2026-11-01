@@ -29,5 +29,13 @@ namespace OnibusExpress.Tests
             // Assert
             Assert.Equal(cpfValido, cpf.Numero);
         }
+
+        [Fact]
+        public void Deve_Mascarar_Cpf_Exibindo_Apenas_Digitos_Centrais()
+        {
+            var cpf = new Cpf("529.982.247-25");
+
+            Assert.Equal("***.982.247-**", cpf.Mascarado());
+        }
     }
 }

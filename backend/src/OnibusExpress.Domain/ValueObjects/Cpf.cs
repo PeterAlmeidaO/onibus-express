@@ -22,6 +22,9 @@ namespace OnibusExpress.Domain.ValueObjects
             Numero = cpfLimpo;
         }
 
+        // Exibe só os 6 dígitos centrais (padrão LGPD em comprovantes): ***.982.247-**
+        public string Mascarado() => $"***.{Numero[3..6]}.{Numero[6..9]}-**";
+
         private static bool Validar(string cpf)
         {
             if (cpf.Length != 11) return false;
