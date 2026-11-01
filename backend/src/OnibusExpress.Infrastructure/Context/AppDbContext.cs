@@ -23,6 +23,10 @@ namespace OnibusExpress.Infrastructure.Context
                 entity.HasIndex(e => e.CodigoReserva).IsUnique(); // Garante código único no banco
                 entity.Property(e => e.CodigoReserva).HasMaxLength(20).IsRequired();
 
+                // Restrict: apagar viagem ou passageiro com reservas deve falhar, não apagar o histórico junto
+                entity.HasOne(e => e.Viagem).WithMany().HasForeignKey(e => e.ViagemId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Passageiro).WithMany().HasForeignKey(e => e.PassageiroId).OnDelete(DeleteBehavior.Restrict);
+
                 // Garante no banco que um assento só tenha uma reserva confirmada por viagem (evita overbooking concorrente)
                 entity.HasIndex(e => new { e.ViagemId, e.NumeroAssento })
                       .IsUnique()
@@ -45,6 +49,11 @@ namespace OnibusExpress.Infrastructure.Context
                        .HasMaxLength(11)
                        .IsRequired();
                 });
+            });
+
+            modelBuilder.Entity<Viagem>(entity =>
+            {
+                entity.HasOne(e => e.Rota).WithMany().HasForeignKey(e => e.RotaId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Rota>(entity =>
