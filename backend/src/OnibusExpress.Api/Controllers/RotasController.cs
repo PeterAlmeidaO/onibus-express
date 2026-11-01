@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using OnibusExpress.Application.DTOs;
 using OnibusExpress.Application.Interfaces;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OnibusExpress.Api.Controllers
@@ -16,7 +18,8 @@ namespace OnibusExpress.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarTodas()
+        [ProducesResponseType(typeof(IEnumerable<RotaDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<RotaDto>>> ListarTodas()
         {
             return Ok(await _rotaService.ListarTodasAsync());
         }

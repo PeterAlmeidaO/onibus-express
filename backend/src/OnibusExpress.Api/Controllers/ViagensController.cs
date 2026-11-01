@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using OnibusExpress.Application.DTOs;
 using OnibusExpress.Application.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace OnibusExpress.Api.Controllers
@@ -17,13 +19,16 @@ namespace OnibusExpress.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Buscar([FromQuery] string? origem, [FromQuery] string? destino, [FromQuery] DateTime? data)
+        [ProducesResponseType(typeof(IEnumerable<ViagemResumoDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<ViagemResumoDto>>> Buscar([FromQuery] string? origem, [FromQuery] string? destino, [FromQuery] DateTime? data)
         {
             return Ok(await _viagemService.BuscarAsync(origem, destino, data));
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Detalhes(Guid id)
+        [ProducesResponseType(typeof(ViagemDetalheDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErroDto), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ViagemDetalheDto>> Detalhes(Guid id)
         {
             return Ok(await _viagemService.DetalhesAsync(id));
         }
