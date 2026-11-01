@@ -57,5 +57,26 @@ namespace OnibusExpress.Tests.Unit.Services
             Assert.Equal("São Paulo", resultado.Origem);
             Assert.Equal("Rio de Janeiro", resultado.Destino);
         }
+
+        [Fact]
+        public async Task BuscarAsync_SemData_BuscaApenasViagensFuturas()
+        {
+            var antes = DateTime.UtcNow;
+
+            await _service.BuscarAsync(null, null, null);
+
+            _mockViagemRepository.Verify(r => r.BuscarAsync(null, null, It.Is<DateTime?>(d => d >= antes), null), Times.Once);
+        }
+
+        [Fact]
+        public async Task BuscarAsync_ComData_UsaDiaInteiroNoHorarioDeBrasilia()
+        {
+            // 10/01/2030 em Brasília (UTC-3) = 10/01 03:00Z até 11/01 03:00Z
+            await _service.BuscarAsync(null, null, new DateTime(2030, 1, 10));
+
+            _mockViagemRepository.Verify(r => r.BuscarAsync(null, null,
+                new DateTime(2030, 1, 10, 3, 0, 0, DateTimeKind.Utc),
+                new DateTime(2030, 1, 11, 3, 0, 0, DateTimeKind.Utc)), Times.Once);
+        }
     }
 }

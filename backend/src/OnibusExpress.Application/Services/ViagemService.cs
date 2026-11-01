@@ -21,15 +21,23 @@ namespace OnibusExpress.Application.Services
             _reservaRepository = reservaRepository;
         }
 
+        // ponytail: fuso fixo da operação; tornar configurável se houver rotas em outros fusos
+        private static readonly TimeZoneInfo FusoBrasilia = TimeZoneInfo.FindSystemTimeZoneById("America/Sao_Paulo");
+
         public async Task<IEnumerable<ViagemResumoDto>> BuscarAsync(string? origem, string? destino, DateTime? data)
         {
-            DateTime? inicio = null, fim = null;
+            // Viagens que já partiram não são mais ofertadas na busca
+            var inicio = DateTime.UtcNow;
+            DateTime? fim = null;
 
             if (data.HasValue)
             {
-                // Força a data recebida a ser tratada como UTC e busca a janela de 24 horas daquele dia
-                inicio = DateTime.SpecifyKind(data.Value.Date, DateTimeKind.Utc);
-                fim = inicio.Value.AddDays(1);
+                // A data informada é um dia do calendário no horário de Brasília; convertido para a janela UTC equivalente
+                var inicioDoDia = DateTime.SpecifyKind(data.Value.Date, DateTimeKind.Unspecified);
+                var inicioDoDiaUtc = TimeZoneInfo.ConvertTimeToUtc(inicioDoDia, FusoBrasilia);
+                fim = TimeZoneInfo.ConvertTimeToUtc(inicioDoDia.AddDays(1), FusoBrasilia);
+
+                if (inicioDoDiaUtc > inicio) inicio = inicioDoDiaUtc;
             }
 
             var viagens = await _viagemRepository.BuscarAsync(origem, destino, inicio, fim);
