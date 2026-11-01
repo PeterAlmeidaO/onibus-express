@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using OnibusExpress.Application.Interfaces;
+using OnibusExpress.Application.Services;
 using OnibusExpress.Domain.Interfaces;
 using OnibusExpress.Infrastructure.Context;
 using OnibusExpress.Infrastructure.Repositories;
@@ -15,9 +17,9 @@ builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
 builder.Services.AddScoped<IPassageiroRepository, PassageiroRepository>();
 builder.Services.AddScoped<IRotaRepository, RotaRepository>();
 
-builder.Services.AddScoped<OnibusExpress.Application.Services.ReservaApplicationService>();
-builder.Services.AddScoped<OnibusExpress.Application.Services.ViagemService>();
-builder.Services.AddScoped<OnibusExpress.Application.Services.RotaService>();
+builder.Services.AddScoped<IReservaService, ReservaService>();
+builder.Services.AddScoped<IViagemService, ViagemService>();
+builder.Services.AddScoped<IRotaService, RotaService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

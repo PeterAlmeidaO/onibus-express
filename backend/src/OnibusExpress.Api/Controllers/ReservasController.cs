@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OnibusExpress.Application.DTOs;
-using OnibusExpress.Application.Services;
+using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Api.Validations;
 using System;
@@ -12,10 +12,10 @@ namespace OnibusExpress.Api.Controllers
     [Route("api/reservas")]
     public class ReservasController : ControllerBase
     {
-        private readonly ReservaApplicationService _reservaService;
+        private readonly IReservaService _reservaService;
         private readonly ILogger<ReservasController> _logger;
 
-        public ReservasController(ReservaApplicationService reservaService, ILogger<ReservasController> logger)
+        public ReservasController(IReservaService reservaService, ILogger<ReservasController> logger)
         {
             _reservaService = reservaService;
             _logger = logger;
