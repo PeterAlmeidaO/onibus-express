@@ -29,14 +29,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Adiciona a política de CORS liberando geral para testes locais
+// CORS: qualquer origem só em Development; nos demais ambientes apenas as origens de "Cors:Origens"
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("PermitirTudo", policy =>
+    options.AddPolicy("Frontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+            policy.AllowAnyOrigin();
+        else
+            policy.WithOrigins(builder.Configuration.GetSection("Cors:Origens").Get<string[]>() ?? []);
+
+        policy.AllowAnyHeader().AllowAnyMethod();
     });
 });
 
@@ -73,7 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("PermitirTudo");
+app.UseCors("Frontend");
 app.UseAuthorization();
 app.MapControllers();
 
