@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnibusExpress.Infrastructure.Context;
+using OnibusExpress.Application.Services;
+using OnibusExpress.Domain.Exceptions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,74 +11,47 @@ namespace OnibusExpress.Api.Controllers
     [Route("api/viagens")]
     public class ViagensController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ViagemService _viagemService;
 
-        public ViagensController(AppDbContext context)
+        public ViagensController(ViagemService viagemService)
         {
-            _context = context;
+            _viagemService = viagemService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Buscar([FromQuery] string? origem, [FromQuery] string? destino, [FromQuery] DateTime? data)
         {
-            var query = _context.Viagens.Include(v => v.Rota).AsQueryable();
+            var viagens = await _viagemService.BuscarAsync(origem, destino, data);
 
-            // Aplica os filtros de busca se o usuário enviar
-            if (!string.IsNullOrEmpty(origem))
-                query = query.Where(v => v.Rota.Origem.ToLower().Contains(origem.ToLower()));
-            
-            if (!string.IsNullOrEmpty(destino))
-                query = query.Where(v => v.Rota.Destino.ToLower().Contains(destino.ToLower()));
-
-            if (data.HasValue)
-{
-                // Força a data recebida do Swagger a ser tratada como UTC
-                var dataBuscaUtc = DateTime.SpecifyKind(data.Value.Date, DateTimeKind.Utc);
-                
-                // Calcula o limite final do dia (meia-noite do dia seguinte)
-                var diaSeguinte = dataBuscaUtc.AddDays(1);
-
-                // Busca viagens que aconteçam dentro dessa janela de 24 horas
-                query = query.Where(v => v.DataHoraPartida >= dataBuscaUtc && v.DataHoraPartida < diaSeguinte);
-}
-
-            var viagens = await query.Select(v => new {
+            return Ok(viagens.Select(v => new {
                 v.Id,
                 Origem = v.Rota.Origem,
                 Destino = v.Rota.Destino,
                 v.DataHoraPartida,
                 v.PrecoBase,
                 v.TotalAssentos
-            }).ToListAsync();
-
-            return Ok(viagens);
+            }));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Detalhes(Guid id)
         {
-            var viagem = await _context.Viagens
-                .Include(v => v.Rota)
-                .FirstOrDefaultAsync(v => v.Id == id);
+            try
+            {
+                var (viagem, assentosOcupados) = await _viagemService.DetalhesAsync(id);
 
-            if (viagem == null) return NotFound(new { erro = "Viagem não encontrada." });
-
-            // Busca quais assentos já foram comprados para essa viagem específica
-            var assentosOcupados = await _context.Reservas
-                .Where(r => r.ViagemId == id && r.Status == OnibusExpress.Domain.Entities.ReservaStatus.Confirmada)
-                .Select(r => r.NumeroAssento)
-                .ToListAsync();
-
-            return Ok(new {
-                viagem.Id,
-                Origem = viagem.Rota.Origem,
-                Destino = viagem.Rota.Destino,
-                viagem.DataHoraPartida,
-                viagem.PrecoBase,
-                viagem.TotalAssentos,
-                AssentosOcupados = assentosOcupados,
-                VagasRestantes = viagem.TotalAssentos - assentosOcupados.Count
-            });
+                return Ok(new {
+                    viagem.Id,
+                    Origem = viagem.Rota.Origem,
+                    Destino = viagem.Rota.Destino,
+                    viagem.DataHoraPartida,
+                    viagem.PrecoBase,
+                    viagem.TotalAssentos,
+                    AssentosOcupados = assentosOcupados,
+                    VagasRestantes = viagem.TotalAssentos - assentosOcupados.Count
+                });
+            }
+            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
         }
     }
 }

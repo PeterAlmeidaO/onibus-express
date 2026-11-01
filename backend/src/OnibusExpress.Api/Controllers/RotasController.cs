@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnibusExpress.Infrastructure.Context;
+using OnibusExpress.Application.Services;
 using System.Threading.Tasks;
 
 namespace OnibusExpress.Api.Controllers
@@ -9,17 +8,17 @@ namespace OnibusExpress.Api.Controllers
     [Route("api/rotas")]
     public class RotasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly RotaService _rotaService;
 
-        public RotasController(AppDbContext context)
+        public RotasController(RotaService rotaService)
         {
-            _context = context;
+            _rotaService = rotaService;
         }
 
         [HttpGet]
         public async Task<IActionResult> ListarTodas()
         {
-            var rotas = await _context.Rotas.ToListAsync();
+            var rotas = await _rotaService.ListarTodasAsync();
             return Ok(rotas);
         }
     }

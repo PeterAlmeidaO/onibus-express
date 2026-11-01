@@ -51,5 +51,21 @@ namespace OnibusExpress.Application.Services
 
             return reserva;
         }
+
+        public async Task<Reserva> ConsultarPorCodigoAsync(string codigo)
+        {
+            return await _reservaRepository.GetByCodigoAsync(codigo)
+                ?? throw new NotFoundException("Reserva não encontrada.");
+        }
+
+        public async Task CancelarAsync(string codigo)
+        {
+            var reserva = await ConsultarPorCodigoAsync(codigo);
+
+            // A regra de prazo fica no domínio; a reserva é mantida com status Cancelada (histórico preservado)
+            reserva.Cancelar();
+
+            await _reservaRepository.UpdateAsync(reserva);
+        }
     }
 }
