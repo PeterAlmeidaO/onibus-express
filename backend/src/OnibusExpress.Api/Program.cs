@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using OnibusExpress.Domain.Interfaces;
 using OnibusExpress.Infrastructure.Context;
+using OnibusExpress.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    builder.Services.AddScoped<OnibusExpress.Application.Services.ReservaApplicationService>();
+// Repositórios (Infrastructure) implementam as interfaces do Domain
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
+builder.Services.AddScoped<IPassageiroRepository, PassageiroRepository>();
+
+builder.Services.AddScoped<OnibusExpress.Application.Services.ReservaApplicationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
