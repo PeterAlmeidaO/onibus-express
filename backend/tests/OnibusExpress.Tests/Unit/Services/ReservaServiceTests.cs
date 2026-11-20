@@ -113,10 +113,31 @@ namespace OnibusExpress.Tests.Unit.Services
             var reserva = EntidadesFixture.CriarReserva();
             _mockReservaRepository.Setup(r => r.GetByCodigoAsync(reserva.CodigoReserva)).ReturnsAsync(reserva);
 
-            var resultado = await _service.ConsultarPorCodigoAsync(reserva.CodigoReserva);
+            var resultado = await _service.ConsultarPorCodigoAsync(reserva.CodigoReserva, EntidadesFixture.CpfValido);
 
             Assert.Equal(reserva.CodigoReserva, resultado.Codigo);
             Assert.Equal("***.982.247-**", resultado.Passageiro.Cpf);
+        }
+
+        [Fact]
+        public async Task ConsultarPorCodigoAsync_ComCpfDeOutraPessoa_LancaNotFoundException()
+        {
+            var reserva = EntidadesFixture.CriarReserva();
+            _mockReservaRepository.Setup(r => r.GetByCodigoAsync(reserva.CodigoReserva)).ReturnsAsync(reserva);
+
+            // CPF válido, mas não é o do titular da reserva
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.ConsultarPorCodigoAsync(reserva.CodigoReserva, "11144477735"));
+        }
+
+        [Fact]
+        public async Task CancelarAsync_ComCpfDeOutraPessoa_NaoCancela()
+        {
+            var reserva = EntidadesFixture.CriarReserva(DateTime.UtcNow.AddDays(1));
+            _mockReservaRepository.Setup(r => r.GetByCodigoAsync(reserva.CodigoReserva)).ReturnsAsync(reserva);
+
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.CancelarAsync(reserva.CodigoReserva, "11144477735"));
+            Assert.Equal(ReservaStatus.Confirmada, reserva.Status);
+            _mockReservaRepository.Verify(r => r.UpdateAsync(It.IsAny<Reserva>()), Times.Never);
         }
 
         [Fact]
@@ -124,7 +145,7 @@ namespace OnibusExpress.Tests.Unit.Services
         {
             _mockReservaRepository.Setup(r => r.GetByCodigoAsync(It.IsAny<string>())).ReturnsAsync((Reserva?)null);
 
-            await Assert.ThrowsAsync<NotFoundException>(() => _service.CancelarAsync("ONI-INEXISTENTE"));
+            await Assert.ThrowsAsync<NotFoundException>(() => _service.CancelarAsync("ONI-INEXISTENTE", EntidadesFixture.CpfValido));
         }
 
         [Fact]
@@ -133,7 +154,7 @@ namespace OnibusExpress.Tests.Unit.Services
             var reserva = EntidadesFixture.CriarReserva(DateTime.UtcNow.AddDays(1));
             _mockReservaRepository.Setup(r => r.GetByCodigoAsync(reserva.CodigoReserva)).ReturnsAsync(reserva);
 
-            await _service.CancelarAsync(reserva.CodigoReserva);
+            await _service.CancelarAsync(reserva.CodigoReserva, EntidadesFixture.CpfValido);
 
             Assert.Equal(ReservaStatus.Cancelada, reserva.Status);
             _mockReservaRepository.Verify(r => r.UpdateAsync(reserva), Times.Once);
@@ -145,7 +166,7 @@ namespace OnibusExpress.Tests.Unit.Services
             var reserva = EntidadesFixture.CriarReserva(DateTime.UtcNow.AddHours(1));
             _mockReservaRepository.Setup(r => r.GetByCodigoAsync(reserva.CodigoReserva)).ReturnsAsync(reserva);
 
-            await Assert.ThrowsAsync<RegraNegocioException>(() => _service.CancelarAsync(reserva.CodigoReserva));
+            await Assert.ThrowsAsync<RegraNegocioException>(() => _service.CancelarAsync(reserva.CodigoReserva, EntidadesFixture.CpfValido));
             _mockReservaRepository.Verify(r => r.UpdateAsync(It.IsAny<Reserva>()), Times.Never);
         }
     }
