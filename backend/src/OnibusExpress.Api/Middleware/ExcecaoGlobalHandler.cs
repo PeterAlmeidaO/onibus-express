@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using OnibusExpress.Application.DTOs;
 using OnibusExpress.Domain.Exceptions;
 
 namespace OnibusExpress.Api.Middleware
@@ -28,7 +29,7 @@ namespace OnibusExpress.Api.Middleware
                 _logger.LogError(exception, "Erro não tratado em {Metodo} {Caminho}", httpContext.Request.Method, httpContext.Request.Path);
 
             httpContext.Response.StatusCode = status;
-            await httpContext.Response.WriteAsJsonAsync(new { erro = mensagem }, cancellationToken);
+            await httpContext.Response.WriteAsJsonAsync(new ErroDto(mensagem), cancellationToken);
             return true;
         }
     }
