@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OnibusExpress.Application.DTOs;
+using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Application.Mappings;
 using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.Interfaces;
 
 namespace OnibusExpress.Application.Services
 {
-    public class ViagemService
+    public class ViagemService : IViagemService
     {
         private readonly IViagemRepository _viagemRepository;
         private readonly IReservaRepository _reservaRepository;

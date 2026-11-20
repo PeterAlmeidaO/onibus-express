@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using OnibusExpress.Application.Services;
+using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Domain.Exceptions;
 using System;
 using System.Threading.Tasks;
@@ -10,9 +10,9 @@ namespace OnibusExpress.Api.Controllers
     [Route("api/viagens")]
     public class ViagensController : ControllerBase
     {
-        private readonly ViagemService _viagemService;
+        private readonly IViagemService _viagemService;
 
-        public ViagensController(ViagemService viagemService)
+        public ViagensController(IViagemService viagemService)
         {
             _viagemService = viagemService;
         }

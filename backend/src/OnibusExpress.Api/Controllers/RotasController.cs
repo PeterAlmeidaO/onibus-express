@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using OnibusExpress.Application.Services;
+using OnibusExpress.Application.Interfaces;
 using System.Threading.Tasks;
 
 namespace OnibusExpress.Api.Controllers
@@ -8,9 +8,9 @@ namespace OnibusExpress.Api.Controllers
     [Route("api/rotas")]
     public class RotasController : ControllerBase
     {
-        private readonly RotaService _rotaService;
+        private readonly IRotaService _rotaService;
 
-        public RotasController(RotaService rotaService)
+        public RotasController(IRotaService rotaService)
         {
             _rotaService = rotaService;
         }

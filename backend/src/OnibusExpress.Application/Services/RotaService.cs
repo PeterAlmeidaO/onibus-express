@@ -2,12 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OnibusExpress.Application.DTOs;
+using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Application.Mappings;
 using OnibusExpress.Domain.Interfaces;
 
 namespace OnibusExpress.Application.Services
 {
-    public class RotaService
+    public class RotaService : IRotaService
     {
         private readonly IRotaRepository _rotaRepository;
 

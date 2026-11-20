@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using OnibusExpress.Application.DTOs;
+using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Application.Mappings;
 using OnibusExpress.Domain.Entities;
 using OnibusExpress.Domain.Exceptions;
@@ -9,13 +10,13 @@ using OnibusExpress.Domain.ValueObjects;
 
 namespace OnibusExpress.Application.Services
 {
-    public class ReservaApplicationService
+    public class ReservaService : IReservaService
     {
         private readonly IReservaRepository _reservaRepository;
         private readonly IViagemRepository _viagemRepository;
         private readonly IPassageiroRepository _passageiroRepository;
 
-        public ReservaApplicationService(IReservaRepository reservaRepository, IViagemRepository viagemRepository, IPassageiroRepository passageiroRepository)
+        public ReservaService(IReservaRepository reservaRepository, IViagemRepository viagemRepository, IPassageiroRepository passageiroRepository)
         {
             _reservaRepository = reservaRepository;
             _viagemRepository = viagemRepository;
