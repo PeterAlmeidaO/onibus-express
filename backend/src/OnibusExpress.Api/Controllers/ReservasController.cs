@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using OnibusExpress.Application.DTOs;
 using OnibusExpress.Application.Interfaces;
 using OnibusExpress.Domain.Exceptions;
-using OnibusExpress.Api.Validations;
 using System;
 using System.Threading.Tasks;
 
@@ -24,9 +23,6 @@ namespace OnibusExpress.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] CriarReservaDto dto)
         {
-            if (!CpfValidator.Validar(dto.Cpf))
-                return BadRequest(new { erro = "CPF inválido." });
-
             try
             {
                 var reserva = await _reservaService.CriarReservaAsync(dto);
