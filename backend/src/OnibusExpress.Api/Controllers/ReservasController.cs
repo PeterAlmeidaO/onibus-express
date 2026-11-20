@@ -66,7 +66,7 @@ namespace OnibusExpress.Api.Controllers
             { 
                 Codigo = reserva.CodigoReserva, Status = reserva.Status, Assento = reserva.NumeroAssento,
                 Viagem = new { Origem = reserva.Viagem.Rota.Origem, Destino = reserva.Viagem.Rota.Destino, Partida = reserva.Viagem.DataHoraPartida },
-                Passageiro = new { Nome = reserva.Passageiro.Nome, Cpf = reserva.Passageiro.Cpf }
+                Passageiro = new { Nome = reserva.Passageiro.Nome, Cpf = reserva.Passageiro.Cpf.Mascarado() }
             });
         }
 
