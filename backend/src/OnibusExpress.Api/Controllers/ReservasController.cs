@@ -15,11 +15,13 @@ namespace OnibusExpress.Api.Controllers
     {
         private readonly ReservaApplicationService _reservaService;
         private readonly AppDbContext _context;
+        private readonly ILogger<ReservasController> _logger;
 
-        public ReservasController(ReservaApplicationService reservaService, AppDbContext context)
+        public ReservasController(ReservaApplicationService reservaService, AppDbContext context, ILogger<ReservasController> logger)
         {
             _reservaService = reservaService;
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -40,7 +42,12 @@ namespace OnibusExpress.Api.Controllers
             catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
             catch (ArgumentException ex) { return BadRequest(new { erro = ex.Message }); }
             catch (InvalidOperationException ex) { return Conflict(new { erro = ex.Message }); }
-            catch (Exception ex) { return StatusCode(500, new { erro = "Erro interno", detalhe = ex.Message }); }
+            catch (Exception ex)
+            {
+                // Detalhe vai só para o log; o cliente recebe mensagem genérica
+                _logger.LogError(ex, "Erro ao criar reserva para a viagem {ViagemId}", request.ViagemId);
+                return StatusCode(500, new { erro = "Erro interno ao processar a reserva." });
+            }
         }
 
         [HttpGet("{codigo}")]
