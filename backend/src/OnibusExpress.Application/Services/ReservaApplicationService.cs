@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using OnibusExpress.Domain.Entities;
+using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.ValueObjects;
 using OnibusExpress.Infrastructure.Context;
 
@@ -22,7 +23,7 @@ namespace OnibusExpress.Application.Services
             var cpf = new Cpf(cpfInput);
 
             var viagem = await _context.Viagens.FindAsync(viagemId);
-            if (viagem == null) throw new Exception("Viagem não encontrada.");
+            if (viagem == null) throw new NotFoundException("Viagem não encontrada.");
 
             if (viagem.IsPassada()) 
                 throw new InvalidOperationException("Não é possível reservar passagens para uma viagem que já ocorreu.");

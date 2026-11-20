@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnibusExpress.Application.Services;
+using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Infrastructure.Context; 
 using OnibusExpress.Api.Validations; 
 using System;
@@ -36,6 +37,7 @@ namespace OnibusExpress.Api.Controllers
 
                 return CreatedAtAction(nameof(ConsultarPorCodigo), new { codigo = reserva.CodigoReserva }, new { reserva.CodigoReserva, reserva.Status });
             }
+            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
             catch (ArgumentException ex) { return BadRequest(new { erro = ex.Message }); }
             catch (InvalidOperationException ex) { return Conflict(new { erro = ex.Message }); }
             catch (Exception ex) { return StatusCode(500, new { erro = "Erro interno", detalhe = ex.Message }); }
