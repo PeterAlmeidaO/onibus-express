@@ -24,7 +24,8 @@ namespace OnibusExpress.Domain.Entities
             Nome = nome;
             Cpf = cpf;
             Email = email;
-            DataNascimento = dataNascimento;
+            // Npgsql rejeita DateTime com Kind Unspecified em timestamptz; data de nascimento não tem hora
+            DataNascimento = DateTime.SpecifyKind(dataNascimento.Date, DateTimeKind.Utc);
         }
     }
 }
