@@ -58,7 +58,9 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao rodar as migrations na inicialização.");
+        logger.LogCritical(ex, "Ocorreu um erro ao rodar as migrations na inicialização.");
+        // Sem banco a API não funciona: falhar aqui deixa o erro visível em vez de subir quebrada
+        throw;
     }
 }
 // FIM DA MIGRATION AUTOMÁTICA E SEED
