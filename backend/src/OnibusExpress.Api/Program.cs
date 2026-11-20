@@ -21,6 +21,10 @@ builder.Services.AddScoped<IReservaService, ReservaService>();
 builder.Services.AddScoped<IViagemService, ViagemService>();
 builder.Services.AddScoped<IRotaService, RotaService>();
 
+// Tratamento global de exceções (Middleware/ExcecaoGlobalHandler)
+builder.Services.AddExceptionHandler<OnibusExpress.Api.Middleware.ExcecaoGlobalHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -57,7 +61,9 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "Ocorreu um erro ao rodar as migrations na inicialização.");
     }
 }
-// FIM DA MIGRATION AUTOMÁTICA E SEED 
+// FIM DA MIGRATION AUTOMÁTICA E SEED
+
+app.UseExceptionHandler();
 
 // Configura o Swagger para documentação da API
 if (app.Environment.IsDevelopment())

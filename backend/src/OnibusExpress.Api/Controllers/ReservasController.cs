@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OnibusExpress.Application.DTOs;
 using OnibusExpress.Application.Interfaces;
-using OnibusExpress.Domain.Exceptions;
-using System;
 using System.Threading.Tasks;
 
 namespace OnibusExpress.Api.Controllers
@@ -12,32 +10,17 @@ namespace OnibusExpress.Api.Controllers
     public class ReservasController : ControllerBase
     {
         private readonly IReservaService _reservaService;
-        private readonly ILogger<ReservasController> _logger;
 
-        public ReservasController(IReservaService reservaService, ILogger<ReservasController> logger)
+        public ReservasController(IReservaService reservaService)
         {
             _reservaService = reservaService;
-            _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> Criar([FromBody] CriarReservaDto dto)
         {
-            try
-            {
-                var reserva = await _reservaService.CriarReservaAsync(dto);
-
-                return CreatedAtAction(nameof(ConsultarPorCodigo), new { codigo = reserva.CodigoReserva }, reserva);
-            }
-            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
-            catch (ArgumentException ex) { return BadRequest(new { erro = ex.Message }); }
-            catch (InvalidOperationException ex) { return Conflict(new { erro = ex.Message }); }
-            catch (Exception ex)
-            {
-                // Detalhe vai só para o log; o cliente recebe mensagem genérica
-                _logger.LogError(ex, "Erro ao criar reserva para a viagem {ViagemId}", dto.ViagemId);
-                return StatusCode(500, new { erro = "Erro interno ao processar a reserva." });
-            }
+            var reserva = await _reservaService.CriarReservaAsync(dto);
+            return CreatedAtAction(nameof(ConsultarPorCodigo), new { codigo = reserva.CodigoReserva }, reserva);
         }
 
         [HttpGet("{codigo}")]
@@ -45,11 +28,7 @@ namespace OnibusExpress.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> ConsultarPorCodigo([FromRoute] string codigo)
         {
-            try
-            {
-                return Ok(await _reservaService.ConsultarPorCodigoAsync(codigo));
-            }
-            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
+            return Ok(await _reservaService.ConsultarPorCodigoAsync(codigo));
         }
 
         [HttpDelete("{codigo}")]
@@ -58,13 +37,8 @@ namespace OnibusExpress.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> CancelarReserva([FromRoute] string codigo)
         {
-            try
-            {
-                await _reservaService.CancelarAsync(codigo);
-                return NoContent();
-            }
-            catch (NotFoundException ex) { return NotFound(new { erro = ex.Message }); }
-            catch (InvalidOperationException ex) { return BadRequest(new { erro = ex.Message }); }
+            await _reservaService.CancelarAsync(codigo);
+            return NoContent();
         }
     }
 }

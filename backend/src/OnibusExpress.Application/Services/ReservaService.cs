@@ -31,13 +31,13 @@ namespace OnibusExpress.Application.Services
             if (viagem == null) throw new NotFoundException("Viagem não encontrada.");
 
             if (viagem.IsPassada()) 
-                throw new InvalidOperationException("Não é possível reservar passagens para uma viagem que já ocorreu.");
+                throw new RegraNegocioException("Não é possível reservar passagens para uma viagem que já ocorreu.");
 
             if (dto.NumeroAssento <= 0 || dto.NumeroAssento > viagem.TotalAssentos)
                 throw new ArgumentException("Número de assento inválido para esta viagem.");
 
             if (await _reservaRepository.ExisteAssentoConfirmadoAsync(dto.ViagemId, dto.NumeroAssento))
-                throw new InvalidOperationException("Este assento já está ocupado.");
+                throw new ConflitoException("Este assento já está ocupado.");
 
             var passageiro = await _passageiroRepository.GetByCpfAsync(cpf.Numero);
 

@@ -1,4 +1,5 @@
 using System;
+using OnibusExpress.Domain.Exceptions;
 
 namespace OnibusExpress.Domain.Entities
 {
@@ -45,13 +46,13 @@ namespace OnibusExpress.Domain.Entities
         public void Cancelar()
         {
             if (Viagem == null) throw new InvalidOperationException("Os dados da viagem não foram carregados para validação.");
-            if (Status == ReservaStatus.Cancelada) throw new InvalidOperationException("A reserva já está cancelada.");
+            if (Status == ReservaStatus.Cancelada) throw new RegraNegocioException("A reserva já está cancelada.");
 
             var tempoAtePartida = Viagem.DataHoraPartida - DateTime.UtcNow;
             
             if (tempoAtePartida.TotalHours < 2)
             {
-                throw new InvalidOperationException("O cancelamento só é permitido até 2 horas antes da partida.");
+                throw new RegraNegocioException("O cancelamento só é permitido até 2 horas antes da partida.");
             }
 
             Status = ReservaStatus.Cancelada;
