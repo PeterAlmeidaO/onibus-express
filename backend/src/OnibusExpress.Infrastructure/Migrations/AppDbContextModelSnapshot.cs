@@ -166,13 +166,13 @@ namespace OnibusExpress.Infrastructure.Migrations
                     b.HasOne("OnibusExpress.Domain.Entities.Passageiro", "Passageiro")
                         .WithMany()
                         .HasForeignKey("PassageiroId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("OnibusExpress.Domain.Entities.Viagem", "Viagem")
                         .WithMany()
                         .HasForeignKey("ViagemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Passageiro");
@@ -185,7 +185,7 @@ namespace OnibusExpress.Infrastructure.Migrations
                     b.HasOne("OnibusExpress.Domain.Entities.Rota", "Rota")
                         .WithMany()
                         .HasForeignKey("RotaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Rota");
