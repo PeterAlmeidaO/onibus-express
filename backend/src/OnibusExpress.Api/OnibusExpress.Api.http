@@ -1,6 +1,35 @@
 @OnibusExpress.Api_HostAddress = http://localhost:5277
 
-GET {{OnibusExpress.Api_HostAddress}}/weatherforecast/
+### Lista todas as rotas
+GET {{OnibusExpress.Api_HostAddress}}/api/rotas
 Accept: application/json
 
-###
+### Busca viagens futuras (filtros opcionais: origem, destino, data no horário de Brasília)
+GET {{OnibusExpress.Api_HostAddress}}/api/viagens?origem=São Paulo
+Accept: application/json
+
+### Detalhes de uma viagem (substitua pelo Id retornado na busca)
+@viagemId = 00000000-0000-0000-0000-000000000000
+GET {{OnibusExpress.Api_HostAddress}}/api/viagens/{{viagemId}}
+Accept: application/json
+
+### Cria uma reserva
+POST {{OnibusExpress.Api_HostAddress}}/api/reservas
+Content-Type: application/json
+
+{
+  "viagemId": "{{viagemId}}",
+  "nome": "João Silva",
+  "cpf": "529.982.247-25",
+  "email": "joao@email.com",
+  "dataNascimento": "1990-01-01",
+  "numeroAssento": 10
+}
+
+### Consulta uma reserva (substitua pelo código retornado na criação)
+@codigo = ONI-0000000000
+GET {{OnibusExpress.Api_HostAddress}}/api/reservas/{{codigo}}
+Accept: application/json
+
+### Cancela uma reserva
+DELETE {{OnibusExpress.Api_HostAddress}}/api/reservas/{{codigo}}
