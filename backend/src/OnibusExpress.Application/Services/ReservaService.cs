@@ -55,15 +55,15 @@ namespace OnibusExpress.Application.Services
             return reserva.ToCriadaDto();
         }
 
-        public async Task<ReservaDetalheDto> ConsultarPorCodigoAsync(string codigo)
+        public async Task<ReservaDetalheDto> ConsultarPorCodigoAsync(string codigo, string cpfTitular)
         {
-            var reserva = await ObterReservaAsync(codigo);
+            var reserva = await ObterReservaDoTitularAsync(codigo, cpfTitular);
             return reserva.ToDetalheDto();
         }
 
-        public async Task CancelarAsync(string codigo)
+        public async Task CancelarAsync(string codigo, string cpfTitular)
         {
-            var reserva = await ObterReservaAsync(codigo);
+            var reserva = await ObterReservaDoTitularAsync(codigo, cpfTitular);
 
             // A regra de prazo fica no domínio; a reserva é mantida com status Cancelada (histórico preservado)
             reserva.Cancelar();
@@ -71,10 +71,16 @@ namespace OnibusExpress.Application.Services
             await _reservaRepository.UpdateAsync(reserva);
         }
 
-        private async Task<Reserva> ObterReservaAsync(string codigo)
+        // Só o titular (CPF da reserva) pode consultar ou cancelar; código ou CPF errados respondem igual (404)
+        private async Task<Reserva> ObterReservaDoTitularAsync(string codigo, string cpfTitular)
         {
-            return await _reservaRepository.GetByCodigoAsync(codigo)
-                ?? throw new NotFoundException("Reserva não encontrada.");
+            var cpf = new Cpf(cpfTitular);
+            var reserva = await _reservaRepository.GetByCodigoAsync(codigo);
+
+            if (reserva == null || reserva.Passageiro.Cpf.Numero != cpf.Numero)
+                throw new NotFoundException("Reserva não encontrada.");
+
+            return reserva;
         }
     }
 }
