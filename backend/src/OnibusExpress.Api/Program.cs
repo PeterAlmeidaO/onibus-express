@@ -52,11 +52,11 @@ using (var scope = app.Services.CreateScope())
     try
     {
         // 1. Puxa o contexto e cria as tabelas no banco de dados vazio
-        var context = services.GetRequiredService<OnibusExpress.Infrastructure.Context.AppDbContext>();
+        var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
 
-        // 2. Usa o MESMO 'services' para chamar o Seeder logo em seguida
-        OnibusExpress.Infrastructure.Context.DbSeeder.Seed(services);
+        // 2. Popula o banco usando o mesmo contexto do escopo
+        DbSeeder.Seed(context);
     }
     catch (Exception ex)
     {
