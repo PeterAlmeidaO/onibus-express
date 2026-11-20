@@ -6,9 +6,9 @@ namespace OnibusExpress.Domain.Entities
     public class Passageiro
     {
         public Guid Id { get; private set; }
-        public string Nome { get; private set; }
-        public Cpf Cpf { get; private set; }
-        public string Email { get; private set; }
+        public string Nome { get; private set; } = null!;
+        public Cpf Cpf { get; private set; } = null!;
+        public string Email { get; private set; } = null!;
         public DateTime DataNascimento { get; private set; }
 
         protected Passageiro() { }
@@ -24,7 +24,17 @@ namespace OnibusExpress.Domain.Entities
             Nome = nome;
             Cpf = cpf;
             Email = email;
-            DataNascimento = dataNascimento;
+            // Npgsql rejeita DateTime com Kind Unspecified em timestamptz; data de nascimento não tem hora
+            DataNascimento = DateTime.SpecifyKind(dataNascimento.Date, DateTimeKind.Utc);
+        }
+
+        public void AtualizarContato(string nome, string email)
+        {
+            if (string.IsNullOrWhiteSpace(nome)) throw new ArgumentException("O nome é obrigatório.");
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("O e-mail é obrigatório.");
+
+            Nome = nome;
+            Email = email;
         }
     }
 }

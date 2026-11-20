@@ -32,10 +32,14 @@ namespace OnibusExpress.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
 
                     b.Property<string>("Nome")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("Id");
 
@@ -75,7 +79,10 @@ namespace OnibusExpress.Infrastructure.Migrations
 
                     b.HasIndex("PassageiroId");
 
-                    b.HasIndex("ViagemId");
+                    b.HasIndex("ViagemId", "NumeroAssento")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Reservas_ViagemId_NumeroAssento_Confirmada")
+                        .HasFilter("\"Status\" = 0");
 
                     b.ToTable("Reservas");
                 });
@@ -87,13 +94,17 @@ namespace OnibusExpress.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Destino")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<TimeSpan>("DuracaoEstimada")
                         .HasColumnType("interval");
 
                     b.Property<string>("Origem")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -146,7 +157,8 @@ namespace OnibusExpress.Infrastructure.Migrations
                                 .HasForeignKey("PassageiroId");
                         });
 
-                    b.Navigation("Cpf");
+                    b.Navigation("Cpf")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OnibusExpress.Domain.Entities.Reserva", b =>
@@ -154,13 +166,13 @@ namespace OnibusExpress.Infrastructure.Migrations
                     b.HasOne("OnibusExpress.Domain.Entities.Passageiro", "Passageiro")
                         .WithMany()
                         .HasForeignKey("PassageiroId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("OnibusExpress.Domain.Entities.Viagem", "Viagem")
                         .WithMany()
                         .HasForeignKey("ViagemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Passageiro");
@@ -173,7 +185,7 @@ namespace OnibusExpress.Infrastructure.Migrations
                     b.HasOne("OnibusExpress.Domain.Entities.Rota", "Rota")
                         .WithMany()
                         .HasForeignKey("RotaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Rota");

@@ -1,5 +1,6 @@
 using System;
 using OnibusExpress.Domain.Entities;
+using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.ValueObjects;
 using Xunit;
 
@@ -14,12 +15,10 @@ namespace OnibusExpress.Tests
         }
 
         private Passageiro CriarPassageiro()
-{
-    var cpf = new Cpf("52998224725");
-    // Adicionada a data de nascimento para bater com o novo construtor
-    return new Passageiro("João Silva", cpf, "joao@email.com", new DateTime(1990, 1, 1));
-}
-
+        {
+            var cpf = new Cpf("52998224725");
+            return new Passageiro("João Silva", cpf, "joao@email.com", new DateTime(1990, 1, 1));
+        }
 
         [Fact]
         public void Deve_Permitir_Cancelamento_Com_Mais_De_Duas_Horas_De_Antecedencia()
@@ -45,8 +44,28 @@ namespace OnibusExpress.Tests
             var reserva = new Reserva(viagemProxima, passageiro, 15);
 
             // Act & Assert
-            var excecao = Assert.Throws<InvalidOperationException>(() => reserva.Cancelar());
+            var excecao = Assert.Throws<RegraNegocioException>(() => reserva.Cancelar());
             Assert.Equal("O cancelamento só é permitido até 2 horas antes da partida.", excecao.Message);
+        }
+
+        [Fact]
+        public void Deve_Gerar_Codigo_De_Reserva_Com_Dez_Caracteres_Aleatorios()
+        {
+            var reserva = new Reserva(CriarViagem(DateTime.UtcNow.AddHours(5)), CriarPassageiro(), 15);
+
+            Assert.Matches("^ONI-[0-9A-F]{10}$", reserva.CodigoReserva);
+        }
+
+        [Fact]
+        public void Nao_Deve_Cancelar_Reserva_Ja_Cancelada()
+        {
+            // Arrange
+            var reserva = new Reserva(CriarViagem(DateTime.UtcNow.AddHours(5)), CriarPassageiro(), 15);
+            reserva.Cancelar();
+
+            // Act & Assert
+            var excecao = Assert.Throws<RegraNegocioException>(() => reserva.Cancelar());
+            Assert.Equal("A reserva já está cancelada.", excecao.Message);
         }
     }
 }

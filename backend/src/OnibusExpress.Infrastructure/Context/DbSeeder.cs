@@ -1,18 +1,13 @@
 using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using OnibusExpress.Domain.Entities;
 
 namespace OnibusExpress.Infrastructure.Context
 {
     public static class DbSeeder
     {
-        public static void Seed(IServiceProvider serviceProvider)
+        public static void Seed(AppDbContext context)
         {
-            // Pega a conexão com o banco
-            using var context = new AppDbContext(serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>());
-
             // Se já existirem rotas, significa que o banco já foi populado, então paramos aqui.
             if (context.Rotas.Any() || context.Viagens.Any()) return;
 
@@ -28,7 +23,7 @@ namespace OnibusExpress.Infrastructure.Context
             var viagem3 = new Viagem(rota2, DateTime.UtcNow.AddDays(1), 45.00m, 20);
 
             context.Viagens.AddRange(viagem1, viagem2, viagem3);
-            
+
             // 3. Salva no banco
             context.SaveChanges();
         }

@@ -1,15 +1,16 @@
 using System;
+using OnibusExpress.Domain.Exceptions;
 
 namespace OnibusExpress.Domain.Entities
 {
     public class Reserva
     {
         public Guid Id { get; private set; }
-        public string CodigoReserva { get; private set; }
+        public string CodigoReserva { get; private set; } = null!;
         public Guid ViagemId { get; private set; }
-        public Viagem Viagem { get; private set; }
+        public Viagem Viagem { get; private set; } = null!;
         public Guid PassageiroId { get; private set; }
-        public Passageiro Passageiro { get; private set; }
+        public Passageiro Passageiro { get; private set; } = null!;
         public int NumeroAssento { get; private set; }
         public ReservaStatus Status { get; private set; }
         public DateTime DataCriacao { get; private set; }
@@ -31,25 +32,27 @@ namespace OnibusExpress.Domain.Entities
             NumeroAssento = numeroAssento;
             Status = ReservaStatus.Confirmada;
             DataCriacao = DateTime.UtcNow;
-            
+
             GerarCodigoReserva();
         }
 
         private void GerarCodigoReserva()
         {
-            var randomPart = Guid.NewGuid().ToString().Substring(0, 5).ToUpper();
+            // 10 hex = ~1 trilhão de combinações; com 5 a colisão no índice único ficava provável em ~1.200 reservas
+            var randomPart = Guid.NewGuid().ToString("N")[..10].ToUpper();
             CodigoReserva = $"ONI-{randomPart}";
         }
 
         public void Cancelar()
         {
             if (Viagem == null) throw new InvalidOperationException("Os dados da viagem não foram carregados para validação.");
+            if (Status == ReservaStatus.Cancelada) throw new RegraNegocioException("A reserva já está cancelada.");
 
             var tempoAtePartida = Viagem.DataHoraPartida - DateTime.UtcNow;
-            
+
             if (tempoAtePartida.TotalHours < 2)
             {
-                throw new InvalidOperationException("O cancelamento só é permitido até 2 horas antes da partida.");
+                throw new RegraNegocioException("O cancelamento só é permitido até 2 horas antes da partida.");
             }
 
             Status = ReservaStatus.Cancelada;

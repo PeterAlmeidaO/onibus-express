@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using OnibusExpress.Application.Interfaces;
+using OnibusExpress.Application.Services;
+using OnibusExpress.Domain.Interfaces;
 using OnibusExpress.Infrastructure.Context;
+using OnibusExpress.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,20 +11,35 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    builder.Services.AddScoped<OnibusExpress.Application.Services.ReservaApplicationService>();
+// Repositórios (Infrastructure) implementam as interfaces do Domain
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
+builder.Services.AddScoped<IPassageiroRepository, PassageiroRepository>();
+builder.Services.AddScoped<IRotaRepository, RotaRepository>();
+
+builder.Services.AddScoped<IReservaService, ReservaService>();
+builder.Services.AddScoped<IViagemService, ViagemService>();
+builder.Services.AddScoped<IRotaService, RotaService>();
+
+// Tratamento global de exceções (Middleware/ExcecaoGlobalHandler)
+builder.Services.AddExceptionHandler<OnibusExpress.Api.Middleware.ExcecaoGlobalHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Adiciona a política de CORS liberando geral para testes locais
+// CORS: qualquer origem só em Development; nos demais ambientes apenas as origens de "Cors:Origens"
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("PermitirTudo", policy =>
+    options.AddPolicy("Frontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (builder.Environment.IsDevelopment())
+            policy.AllowAnyOrigin();
+        else
+            policy.WithOrigins(builder.Configuration.GetSection("Cors:Origens").Get<string[]>() ?? []);
+
+        policy.AllowAnyHeader().AllowAnyMethod();
     });
 });
 
@@ -33,19 +52,23 @@ using (var scope = app.Services.CreateScope())
     try
     {
         // 1. Puxa o contexto e cria as tabelas no banco de dados vazio
-        var context = services.GetRequiredService<OnibusExpress.Infrastructure.Context.AppDbContext>();
+        var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
 
-        // 2. Usa o MESMO 'services' para chamar o Seeder logo em seguida
-        OnibusExpress.Infrastructure.Context.DbSeeder.Seed(services);
+        // 2. Popula o banco usando o mesmo contexto do escopo
+        DbSeeder.Seed(context);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao rodar as migrations na inicialização.");
+        logger.LogCritical(ex, "Ocorreu um erro ao rodar as migrations na inicialização.");
+        // Sem banco a API não funciona: falhar aqui deixa o erro visível em vez de subir quebrada
+        throw;
     }
 }
-// FIM DA MIGRATION AUTOMÁTICA E SEED 
+// FIM DA MIGRATION AUTOMÁTICA E SEED
+
+app.UseExceptionHandler();
 
 // Configura o Swagger para documentação da API
 if (app.Environment.IsDevelopment())
@@ -53,7 +76,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("PermitirTudo");
+app.UseCors("Frontend");
 app.UseAuthorization();
 app.MapControllers();
 
