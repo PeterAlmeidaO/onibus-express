@@ -26,10 +26,12 @@ Content-Type: application/json
   "numeroAssento": 10
 }
 
-### Consulta uma reserva (substitua pelo código retornado na criação)
+### Consulta uma reserva (exige o CPF do titular no header X-Cpf)
 @codigo = ONI-0000000000
 GET {{OnibusExpress.Api_HostAddress}}/api/reservas/{{codigo}}
+X-Cpf: 529.982.247-25
 Accept: application/json
 
-### Cancela uma reserva
+### Cancela uma reserva (exige o CPF do titular no header X-Cpf)
 DELETE {{OnibusExpress.Api_HostAddress}}/api/reservas/{{codigo}}
+X-Cpf: 529.982.247-25
