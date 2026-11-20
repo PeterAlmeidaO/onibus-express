@@ -44,6 +44,7 @@ namespace OnibusExpress.Domain.Entities
         public void Cancelar()
         {
             if (Viagem == null) throw new InvalidOperationException("Os dados da viagem não foram carregados para validação.");
+            if (Status == ReservaStatus.Cancelada) throw new InvalidOperationException("A reserva já está cancelada.");
 
             var tempoAtePartida = Viagem.DataHoraPartida - DateTime.UtcNow;
             
