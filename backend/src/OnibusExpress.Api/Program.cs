@@ -13,8 +13,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
 builder.Services.AddScoped<IPassageiroRepository, PassageiroRepository>();
+builder.Services.AddScoped<IRotaRepository, RotaRepository>();
 
 builder.Services.AddScoped<OnibusExpress.Application.Services.ReservaApplicationService>();
+builder.Services.AddScoped<OnibusExpress.Application.Services.ViagemService>();
+builder.Services.AddScoped<OnibusExpress.Application.Services.RotaService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
