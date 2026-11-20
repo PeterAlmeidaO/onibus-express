@@ -15,12 +15,10 @@ namespace OnibusExpress.Tests
         }
 
         private Passageiro CriarPassageiro()
-{
-    var cpf = new Cpf("52998224725");
-    // Adicionada a data de nascimento para bater com o novo construtor
-    return new Passageiro("João Silva", cpf, "joao@email.com", new DateTime(1990, 1, 1));
-}
-
+        {
+            var cpf = new Cpf("52998224725");
+            return new Passageiro("João Silva", cpf, "joao@email.com", new DateTime(1990, 1, 1));
+        }
 
         [Fact]
         public void Deve_Permitir_Cancelamento_Com_Mais_De_Duas_Horas_De_Antecedencia()
