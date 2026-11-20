@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using OnibusExpress.Application.DTOs;
+using OnibusExpress.Application.Mappings;
 using OnibusExpress.Domain.Entities;
 using OnibusExpress.Domain.Exceptions;
 using OnibusExpress.Domain.Interfaces;
@@ -20,52 +22,58 @@ namespace OnibusExpress.Application.Services
             _passageiroRepository = passageiroRepository;
         }
 
-        public async Task<Reserva> CriarReservaAsync(Guid viagemId, string nome, string cpfInput, string email, DateTime dataNascimento, int numeroAssento)
+        public async Task<ReservaCriadaDto> CriarReservaAsync(CriarReservaDto dto)
         {
-            var cpf = new Cpf(cpfInput);
+            var cpf = new Cpf(dto.Cpf);
 
-            var viagem = await _viagemRepository.GetByIdAsync(viagemId);
+            var viagem = await _viagemRepository.GetByIdAsync(dto.ViagemId);
             if (viagem == null) throw new NotFoundException("Viagem não encontrada.");
 
             if (viagem.IsPassada()) 
                 throw new InvalidOperationException("Não é possível reservar passagens para uma viagem que já ocorreu.");
 
-            if (numeroAssento <= 0 || numeroAssento > viagem.TotalAssentos)
+            if (dto.NumeroAssento <= 0 || dto.NumeroAssento > viagem.TotalAssentos)
                 throw new ArgumentException("Número de assento inválido para esta viagem.");
 
-            if (await _reservaRepository.ExisteAssentoConfirmadoAsync(viagemId, numeroAssento))
+            if (await _reservaRepository.ExisteAssentoConfirmadoAsync(dto.ViagemId, dto.NumeroAssento))
                 throw new InvalidOperationException("Este assento já está ocupado.");
 
             var passageiro = await _passageiroRepository.GetByCpfAsync(cpf.Numero);
 
             if (passageiro == null)
-                passageiro = new Passageiro(nome, cpf, email, dataNascimento);
+                passageiro = new Passageiro(dto.Nome, cpf, dto.Email, dto.DataNascimento);
             else
                 // Passageiro já cadastrado pelo CPF: mantém o cadastro e atualiza os dados de contato informados
-                passageiro.AtualizarContato(nome, email);
+                passageiro.AtualizarContato(dto.Nome, dto.Email);
 
-            var reserva = new Reserva(viagem, passageiro, numeroAssento);
+            var reserva = new Reserva(viagem, passageiro, dto.NumeroAssento);
 
             // Grava reserva e passageiro (novo ou atualizado) na mesma transação
             await _reservaRepository.AddAsync(reserva);
 
-            return reserva;
+            return reserva.ToCriadaDto();
         }
 
-        public async Task<Reserva> ConsultarPorCodigoAsync(string codigo)
+        public async Task<ReservaDetalheDto> ConsultarPorCodigoAsync(string codigo)
         {
-            return await _reservaRepository.GetByCodigoAsync(codigo)
-                ?? throw new NotFoundException("Reserva não encontrada.");
+            var reserva = await ObterReservaAsync(codigo);
+            return reserva.ToDetalheDto();
         }
 
         public async Task CancelarAsync(string codigo)
         {
-            var reserva = await ConsultarPorCodigoAsync(codigo);
+            var reserva = await ObterReservaAsync(codigo);
 
             // A regra de prazo fica no domínio; a reserva é mantida com status Cancelada (histórico preservado)
             reserva.Cancelar();
 
             await _reservaRepository.UpdateAsync(reserva);
+        }
+
+        private async Task<Reserva> ObterReservaAsync(string codigo)
+        {
+            return await _reservaRepository.GetByCodigoAsync(codigo)
+                ?? throw new NotFoundException("Reserva não encontrada.");
         }
     }
 }
