@@ -5,7 +5,7 @@ namespace OnibusExpress.Domain.ValueObjects
 {
     public class Cpf
     {
-        public string Numero { get; private set; }
+        public string Numero { get; private set; } = null!;
 
         protected Cpf() { }
 

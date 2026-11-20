@@ -6,9 +6,9 @@ namespace OnibusExpress.Domain.Entities
     public class Passageiro
     {
         public Guid Id { get; private set; }
-        public string Nome { get; private set; }
-        public Cpf Cpf { get; private set; }
-        public string Email { get; private set; }
+        public string Nome { get; private set; } = null!;
+        public Cpf Cpf { get; private set; } = null!;
+        public string Email { get; private set; } = null!;
         public DateTime DataNascimento { get; private set; }
 
         protected Passageiro() { }

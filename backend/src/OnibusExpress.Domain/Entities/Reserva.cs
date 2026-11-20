@@ -6,11 +6,11 @@ namespace OnibusExpress.Domain.Entities
     public class Reserva
     {
         public Guid Id { get; private set; }
-        public string CodigoReserva { get; private set; }
+        public string CodigoReserva { get; private set; } = null!;
         public Guid ViagemId { get; private set; }
-        public Viagem Viagem { get; private set; }
+        public Viagem Viagem { get; private set; } = null!;
         public Guid PassageiroId { get; private set; }
-        public Passageiro Passageiro { get; private set; }
+        public Passageiro Passageiro { get; private set; } = null!;
         public int NumeroAssento { get; private set; }
         public ReservaStatus Status { get; private set; }
         public DateTime DataCriacao { get; private set; }

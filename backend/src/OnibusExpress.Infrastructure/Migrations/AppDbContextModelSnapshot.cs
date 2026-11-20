@@ -32,10 +32,14 @@ namespace OnibusExpress.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
 
                     b.Property<string>("Nome")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.HasKey("Id");
 
@@ -90,13 +94,17 @@ namespace OnibusExpress.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Destino")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<TimeSpan>("DuracaoEstimada")
                         .HasColumnType("interval");
 
                     b.Property<string>("Origem")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
@@ -149,7 +157,8 @@ namespace OnibusExpress.Infrastructure.Migrations
                                 .HasForeignKey("PassageiroId");
                         });
 
-                    b.Navigation("Cpf");
+                    b.Navigation("Cpf")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OnibusExpress.Domain.Entities.Reserva", b =>

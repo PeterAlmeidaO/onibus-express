@@ -11,7 +11,7 @@ namespace OnibusExpress.Domain.Interfaces
         Task<IEnumerable<int>> GetAssentosConfirmadosAsync(Guid viagemId);
 
         // Carrega viagem (com rota) e passageiro
-        Task<Reserva> GetByCodigoAsync(string codigo);
+        Task<Reserva?> GetByCodigoAsync(string codigo);
 
         // Persiste a reserva junto com o passageiro (novo ou alterado) referenciado por ela
         Task AddAsync(Reserva reserva);

@@ -5,6 +5,6 @@ namespace OnibusExpress.Domain.Interfaces
 {
     public interface IPassageiroRepository
     {
-        Task<Passageiro> GetByCpfAsync(string cpf);
+        Task<Passageiro?> GetByCpfAsync(string cpf);
     }
 }
