@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
 #  Copia TODOS os arquivos de projeto da sua Clean Architecture
-COPY *.sln ./
+COPY *.slnx ./
 COPY src/OnibusExpress.Api/*.csproj ./src/OnibusExpress.Api/
 COPY src/OnibusExpress.Infrastructure/*.csproj ./src/OnibusExpress.Infrastructure/
 COPY src/OnibusExpress.Application/*.csproj ./src/OnibusExpress.Application/
